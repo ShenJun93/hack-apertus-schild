@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schild</title>
+<style>
+  :root { --bg:#fafaf7; --fg:#1d1d1b; --muted:#6b6b66; --line:#d9d9d2; --mark:#ffe08a; --red:#c8102e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  header { padding:20px 24px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:baseline; }
+  header h1 { margin:0; font-size:22px; } header h1 span { color:var(--red); }
+  header p { margin:0; color:var(--muted); }
+  main { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:16px 24px; }
+  @media (max-width:800px) { main { grid-template-columns:1fr; } }
+  textarea, .box { width:100%; min-height:260px; padding:12px; border:1px solid var(--line); border-radius:6px; background:#fff; font:15px/1.5 ui-monospace, monospace; white-space:pre-wrap; }
+  .box mark { background:var(--mark); border-radius:3px; padding:0 2px; }
+  .ph { color:var(--red); font-weight:600; }
+  button { margin-top:8px; padding:8px 16px; font-size:15px; border:0; border-radius:6px; background:var(--fg); color:#fff; cursor:pointer; }
+  #status { margin-left:12px; color:var(--muted); }
+  #status.warn { color:var(--red); font-weight:600; }
+  table { border-collapse:collapse; width:100%; font-size:14px; } td, th { border-bottom:1px solid var(--line); padding:4px 6px; text-align:left; }
+  h2 { font-size:15px; margin:8px 0; color:var(--muted); font-weight:600; }
+  .wide { grid-column:1 / -1; }
+</style>
+</head>
+<body>
+<header><h1><span>■</span> Schild</h1><p>Personal data stays inside. Rules + Apertus 1.5, on your own hardware.</p></header>
+<main>
+  <section>
+    <h2>Original (never leaves this machine)</h2>
+    <textarea id="input">Sehr geehrte Kollegin
+
+Ich überweise Ihnen Anna Keller, geboren am 12.03.1985, wohnhaft Bahnhofstrasse 5, 3011 Bern. Die Patientin leidet seit längerem an Epilepsie. AHV 756.1234.5678.97, Tel. 044 123 45 67.</textarea>
+    <button id="go">Redact</button><span id="status"></span>
+    <div id="marked" class="box" hidden></div>
+  </section>
+  <section>
+    <h2>What an external AI would see</h2>
+    <div id="output" class="box"></div>
+  </section>
+  <section class="wide">
+    <h2>Entities</h2>
+    <table><thead><tr><th>Placeholder</th><th>Type</th><th>Found by</th></tr></thead><tbody id="rows"></tbody></table>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+$("go").onclick = async () => {
+  const text = $("input").value;
+  $("status").className = ""; $("status").textContent = "Asking Apertus…";
+  const res = await fetch("/v1/redact", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({text})});
+  const data = await res.json();
+  if (!res.ok) { $("status").className = "warn"; $("status").textContent = "Error " + res.status; return; }
+  let html = "", pos = 0;
+  for (const e of data.entities) { html += esc(text.slice(pos, e.start)) + "<mark>" + esc(text.slice(e.start, e.end)) + "</mark>"; pos = e.end; }
+  $("marked").innerHTML = html + esc(text.slice(pos)); $("marked").hidden = false;
+  $("output").innerHTML = esc(data.redacted_text).replace(/\[[A-Z]+_\d+\]/g, (m) => `<span class="ph">${m}</span>`);
+  $("rows").innerHTML = data.entities.map((e) => `<tr><td class="ph">${e.placeholder}</td><td>${e.type}</td><td>${e.source}</td></tr>`).join("");
+  if (data.degraded) { $("status").className = "warn"; $("status").textContent = "Apertus unavailable: rules only. Schild will not forward this text."; }
+  else { $("status").textContent = `${data.entities.length} entities redacted.`; }
+};
+</script>
+</body>
+</html>
