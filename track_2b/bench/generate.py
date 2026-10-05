@@ -25,7 +25,7 @@ EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "Au
              "September", "October", "November", "December"]
 DOMAINS = ["bluewin.ch", "gmx.ch", "sunrise.ch", "proton.me", "hispeed.ch"]
 SLOT_RE = re.compile(r"\{(\w+)\}")
-OUT = Path("data/benchmark.jsonl")
+OUT = Path(__file__).resolve().parent.parent / "data" / "benchmark.jsonl"
 
 
 def ahv_number(rng: random.Random) -> str:

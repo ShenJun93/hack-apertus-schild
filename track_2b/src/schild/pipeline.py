@@ -16,7 +16,7 @@ class RedactionResult:
     hallucinated: int
 
 
-def redact_text(text: str, session: Session, llm) -> RedactionResult:
+def redact_text(text: str, session: Session, llm, avoid: set[str] | None = None) -> RedactionResult:
     spans = detect_rules(text)
     degraded = llm is None
     hallucinated = 0
@@ -28,5 +28,5 @@ def redact_text(text: str, session: Session, llm) -> RedactionResult:
         except DetectorUnavailable:
             degraded = True
     spans = propagate(text, spans, session.known())
-    redacted, entities = apply(text, merge_spans(spans, text), session)
+    redacted, entities = apply(text, merge_spans(spans, text), session, avoid)
     return RedactionResult(session.id, redacted, entities, degraded, hallucinated)

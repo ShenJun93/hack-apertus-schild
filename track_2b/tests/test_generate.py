@@ -35,3 +35,11 @@ def test_italian_documents_use_ticino_addresses():
             if e["type"] == "ADDRESS":
                 address = d["text"][e["start"]:e["end"]]
                 assert ", 6" in address and " CA " not in address, address
+
+
+def test_output_path_does_not_depend_on_the_working_directory():
+    from pathlib import Path
+
+    from bench.generate import OUT
+
+    assert OUT.is_absolute() and OUT == Path(__file__).resolve().parent.parent / "data" / "benchmark.jsonl"

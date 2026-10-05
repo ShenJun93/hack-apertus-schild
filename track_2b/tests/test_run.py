@@ -60,3 +60,14 @@ def test_schild_system_includes_propagation():
     results = run_benchmark(docs, outputs)
     assert results["apertus"]["recall"] == 0.5
     assert results["schild"]["recall"] == 1.0
+
+
+def test_cache_records_dropped_strings(tmp_path):
+    from schild.llm_detector import LlmResult
+
+    class Dropper:
+        def detect(self, text):
+            return LlmResult([], 1, ["Peter Frei"])
+
+    outputs = collect_llm(DOCS[:1], Dropper(), "m", tmp_path / "c.jsonl")
+    assert outputs["a"]["dropped"] == ["Peter Frei"]

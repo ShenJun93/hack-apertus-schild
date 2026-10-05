@@ -1,6 +1,6 @@
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import httpx
 
@@ -60,6 +60,7 @@ class ParseError(ValueError):
 class LlmResult:
     spans: list[Span]
     hallucinated: int
+    dropped: list[str] = field(default_factory=list)  # model strings not found in the text
 
 
 def parse_entities(content: str) -> list[tuple[str, str]]:
@@ -87,7 +88,11 @@ def parse_entities(content: str) -> list[tuple[str, str]]:
     return found
 
 
-def chunk_text(text: str, max_chars: int) -> list[tuple[int, str]]:
+def chunk_text(text: str, max_chars: int, overlap: int = 0) -> list[tuple[int, str]]:
+    """Split at paragraph breaks or spaces. With `overlap`, each chunk after the first starts up to
+    that many characters before the previous one ended, so an entity cut at a boundary is still
+    seen whole in one chunk."""
+    overlap = min(overlap, max_chars // 2)
     chunks = []
     start = 0
     while start < len(text):
@@ -99,7 +104,14 @@ def chunk_text(text: str, max_chars: int) -> list[tuple[int, str]]:
             if cut > start:
                 end = cut
         chunks.append((start, text[start:end]))
-        start = end
+        if end >= len(text):
+            break
+        next_start = end
+        if overlap:
+            back = text.rfind(" ", end - overlap, end)
+            if back > start:
+                next_start = back + 1
+        start = next_start
     return chunks
 
 
@@ -115,30 +127,35 @@ def locate(chunk: str, value: str) -> list[tuple[int, int]]:
 
 
 class LlmDetector:
-    def __init__(self, base_url, api_key, model, *, timeout=120.0, max_chunk_chars=4000, transport=None,
-                 prompts=(SYSTEM_PROMPT,)):
+    """Asks Apertus for entities. The app passes prompts_for(settings.sensitive_pass); the default
+    here is the single general prompt."""
+
+    def __init__(self, base_url, api_key, model, *, timeout=120.0, max_chunk_chars=4000, chunk_overlap=300,
+                 transport=None, prompts=(SYSTEM_PROMPT,)):
         self.model = model
         self.prompts = tuple(prompts)
         self.json_mode = True
         self.max_chunk_chars = max_chunk_chars
+        self.chunk_overlap = chunk_overlap
         self._url = base_url.rstrip("/") + "/chat/completions"
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
         self._client = httpx.Client(timeout=timeout, headers=headers, transport=transport)
 
     def detect(self, text: str) -> LlmResult:
-        spans: list[Span] = []
-        hallucinated = 0
-        for offset, chunk in chunk_text(text, self.max_chunk_chars):
+        spans: dict[tuple[int, int, str], Span] = {}
+        dropped: list[str] = []
+        for offset, chunk in chunk_text(text, self.max_chunk_chars, self.chunk_overlap):
             if not chunk.strip():
                 continue
             for prompt in self.prompts:
                 for value, type_ in self._ask(chunk, prompt):
                     places = locate(chunk, value)
                     if not places:
-                        hallucinated += 1
+                        dropped.append(value)
                     for start, end in places:
-                        spans.append(Span(offset + start, offset + end, type_, chunk[start:end], "apertus"))
-        return LlmResult(spans, hallucinated)
+                        span = Span(offset + start, offset + end, type_, chunk[start:end], "apertus")
+                        spans[(span.start, span.end, span.type)] = span
+        return LlmResult(list(spans.values()), len(dropped), dropped)
 
     def _ask(self, chunk: str, prompt: str) -> list[tuple[str, str]]:
         user = "Find the personal data in this text:\n\n" + chunk
@@ -161,9 +178,12 @@ class LlmDetector:
         try:
             response = self._client.post(self._url, json=payload)
             if response.status_code == 400 and self.json_mode:
-                self.json_mode = False
+                # Maybe the server does not support JSON mode: retry once without it, and switch it
+                # off for good only if that retry works.
                 payload.pop("response_format")
                 response = self._client.post(self._url, json=payload)
+                if response.status_code < 400:
+                    self.json_mode = False
         except httpx.HTTPError as exc:
             raise DetectorUnavailable(f"model request failed: {exc}") from exc
         if response.status_code >= 400:

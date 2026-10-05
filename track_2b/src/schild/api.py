@@ -10,7 +10,7 @@ from .config import load_settings
 from .llm_detector import LlmDetector, prompts_for
 from .pipeline import redact_text
 from .upstream import Upstream, UpstreamError
-from .vault import SessionStore, restore
+from .vault import SessionStore, literal_placeholders, restore
 
 MAX_CHARS = 200_000
 ROLES = {"system", "user", "assistant", "developer", "tool"}
@@ -65,6 +65,8 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
         if not isinstance(messages, list) or not messages:
             raise HTTPException(400, "messages must be a non-empty list")
         session = store.get_or_create()
+        texts = [m["content"] for m in messages if isinstance(m, dict) and isinstance(m.get("content"), str)]
+        avoid = literal_placeholders(*texts)
         outgoing = []
         count = 0
         for message in messages:
@@ -75,7 +77,7 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
                 raise HTTPException(400, "Unknown message role.")
             if len(message["content"]) > MAX_CHARS:
                 raise HTTPException(413, "message too long")
-            result = redact_text(message["content"], session, llm)
+            result = redact_text(message["content"], session, llm, avoid)
             if result.degraded:
                 return JSONResponse(
                     status_code=503,

@@ -63,3 +63,44 @@ def test_store_creates_reuses_and_evicts():
 def test_store_rejects_bad_ids():
     with pytest.raises(ValueError):
         SessionStore().get_or_create("../etc/passwd")
+
+
+def test_existing_placeholder_is_not_reused_when_it_appears_literally():
+    session = Session("t")
+    session.placeholder_for("PERSON", "Anna Keller")
+    text = "Template [PERSON_1] and Anna Keller"
+    redacted, _ = apply(text, spans_for(text, ("Anna Keller", "PERSON")), session)
+    assert redacted == "Template [PERSON_1] and [PERSON_2]"
+    assert restore("[PERSON_2]", session) == "Anna Keller"
+
+
+def test_avoid_can_be_given_for_several_texts():
+    session = Session("t")
+    text = "Anna Keller"
+    redacted, _ = apply(text, spans_for(text, ("Anna Keller", "PERSON")), session, avoid={"[PERSON_1]"})
+    assert redacted == "[PERSON_2]"
+
+
+def test_placeholders_stay_unique_under_threads():
+    import threading
+    import time
+
+    class SlowDict(dict):
+        def __contains__(self, key):
+            found = super().__contains__(key)
+            time.sleep(0.001)  # widen the gap between check and assignment
+            return found
+
+    session = Session("t")
+    session._reverse = SlowDict()
+    out = []
+
+    def worker(i):
+        out.append(session.placeholder_for("PERSON", f"Person {i}"))
+
+    threads = [threading.Thread(target=worker, args=(i,)) for i in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert len(set(out)) == 8

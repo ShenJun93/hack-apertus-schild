@@ -1,9 +1,14 @@
+# Air-gapped setup: the model container sits on an internal-only network with no route out.
+# The app joins that network to reach the model, plus the default network only to serve the UI
+# on the host port. No upstream model is configured, so nothing is forwarded anywhere.
 services:
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server@sha256:559ac229adefe0f7e2d4e32f5222f26927b6bb8ba44b9db08e2544afebf41984
     command: ["-m", "/models/apertus-v1.5-8b-text-q4_k_m.gguf", "--host", "0.0.0.0", "--port", "8081", "-c", "8192", "--jinja"]
     volumes:
       - ./models:/models:ro
+    networks:
+      - airgap
   app:
     depends_on:
       - llm
@@ -12,3 +17,11 @@ services:
       LLM_API_KEY: local
       LLM_NAME: apertus-v1.5-8b-text-q4_k_m
       LLM_TIMEOUT: "600"
+      UPSTREAM_BASE_URL: ""
+    networks:
+      - airgap
+      - default
+
+networks:
+  airgap:
+    internal: true

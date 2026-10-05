@@ -199,3 +199,26 @@ def test_locate_matches_whole_words_only():
 
     assert locate("Lea kommt. Leasing ist teuer.", "Lea") == [(0, 3)]
     assert locate("Tel. +41 (0)21 345 67 89.", "+41 (0)21 345 67 89") == [(5, 24)]
+
+
+def test_entity_across_a_chunk_boundary_is_found():
+    text = "a" * 40 + " Anna Keller wohnt hier und hat noch mehr Text dabei."
+
+    def handler(request):
+        chunk = json.loads(request.content)["messages"][1]["content"]
+        return reply(entities_json(("Anna Keller", "PERSON")) if "Anna Keller" in chunk else entities_json())
+
+    spans = detector(handler, max_chunk_chars=50).detect(text).spans
+    assert [(text[s.start:s.end]) for s in spans] == ["Anna Keller"]
+
+
+def test_json_mode_kept_when_the_retry_also_fails():
+    d = detector(lambda r: httpx.Response(400, text="context too long"))
+    with pytest.raises(DetectorUnavailable):
+        d.detect("Anna")
+    assert d.json_mode is True
+
+
+def test_dropped_strings_are_recorded():
+    result = detector(lambda r: reply(entities_json(("Peter Frei", "PERSON")))).detect("Anna kommt.")
+    assert result.dropped == ["Peter Frei"] and result.hallucinated == 1

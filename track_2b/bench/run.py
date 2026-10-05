@@ -56,7 +56,8 @@ def collect_llm(docs: list[dict], llm, model: str, cache_path: Path) -> dict[str
             started = time.perf_counter()
             try:
                 result = llm.detect(doc["text"])
-                output = {"spans": [_as_dict(s) for s in result.spans], "hallucinated": result.hallucinated, "error": None}
+                output = {"spans": [_as_dict(s) for s in result.spans], "hallucinated": result.hallucinated,
+                          "dropped": result.dropped, "error": None}
             except DetectorUnavailable as exc:
                 output = {"spans": [], "hallucinated": 0, "error": str(exc)}
             output["latency_s"] = round(time.perf_counter() - started, 3)

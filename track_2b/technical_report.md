@@ -58,12 +58,12 @@ third-party Q4_K_M GGUF of the text-only conversion (5.1 GB), mounted from `./mo
 
 - **Build time:** two downloads, the Docker images (the llama.cpp image is pinned by digest) and
   the GGUF file.
-- **Runtime:** the setup needs no network. We did not enforce this with an internal-only Docker
-  network.
+- **Runtime:** the model container sits on an internal-only Docker network. From inside it we
+  checked: no DNS answer and no route out. No upstream model is configured in this mode.
 
-On our 12-thread CPU the local model found all four entities in a German test sentence (name,
-address, diagnosis, religion). That run took 60 s for one sentence with one prompt; the default
-sends two prompts. The local model's accuracy was not benchmarked.
+On our 12-thread CPU, a German sentence with a name, an address and a diagnosis went through
+`make local` end to end: all three were redacted, in 107.5 s with the default two prompts. The
+local model's accuracy was not benchmarked.
 
 The default `make run` points at the CSCS-hosted endpoint, so judges need neither a GPU nor a 5 GB
 download. The code path is identical in both modes; only `LLM_BASE_URL` changes. Details are in
@@ -136,8 +136,8 @@ outside the labels: "AHV-Nummer" as SOCIAL, "rifiuta le trasfusioni" as HEALTH a
 interpreter" as RELIGION. The last two arguably reveal sensitive facts.
 
 **Hallucinations.** Per run, Apertus returned 8–22 strings (synthetic set) and 0–1 (hard set)
-that do not occur in the text. They are dropped. We did not check whether some are near-misses of
-real entities, such as whitespace or Unicode variants.
+that do not occur in the text. They are dropped. The cached runs predate recording those strings,
+so we could not check whether some are near-misses of real entities; new runs store them.
 
 **Propagation** changes no number in this table: the templates repeat each value in exactly the
 same spelling, and exact repeats were already found. It closes leaks the benchmark does not
@@ -195,10 +195,12 @@ Recall per language in run D: German 80.9%, Italian 80.4%, French 77.8%, English
 - **Synthetic data is cleaner than real files.** Fifteen documents per template are similar to
   each other. The hard set has only 66 entities, so a single entity moves its recall by 1.5
   points.
-- **Chunk boundaries.** In texts longer than 4,000 characters, a chunk boundary can split an
-  entity; the benchmark documents are shorter.
-- **Local mode** is proven to start and to find entities in one sentence, not to be fast or as
-  accurate as the hosted model. The 4 GB GPU available to us could not hold it.
+- **Long texts.** Texts longer than 4,000 characters are split into chunks that overlap by up
+  to 300 characters, so an entity at a boundary is seen whole; the benchmark documents are
+  shorter, so this path is covered by unit tests only.
+- **Local mode** is proven to run end to end without network access, not to be fast (about two
+  minutes per sentence on CPU) or as accurate as the hosted model. The 4 GB GPU available to us
+  could not hold it.
 - **Vault.** The vault lives in memory: a restart forgets placeholders, so answers that arrive
   after a restart cannot be restored.
 - **Prompts.** Both prompts were written with an AI coding assistant, and the second was chosen
@@ -206,7 +208,7 @@ Recall per language in run D: German 80.9%, Italian 80.4%, French 77.8%, English
 
 ## 7. Reproducibility
 
-- `make test` runs 109 unit tests in Docker; 3 more run only with a real endpoint.
+- `make test` runs 120 unit tests in Docker; 3 more run only with a real endpoint.
 - Model outputs for all five runs are cached in `data/llm_outputs.jsonl`, keyed by model and
   prompt hash, so every table is reproduced without calling a model.
   - `make bench` recomputes the default run (D) into `docs/results.md`.

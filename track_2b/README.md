@@ -23,6 +23,15 @@ If the Apertus pass fails, Schild refuses to forward anything.
     POST /v1/restore             {"session_id": "...", "text": "..."}
     POST /v1/chat/completions    OpenAI-compatible; forwards only redacted text to UPSTREAM_BASE_URL
 
+## Settings
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_NAME` | — , — , `swiss-ai/Apertus-v1.5-8B` | OpenAI-compatible Apertus endpoint |
+| `SCHILD_SENSITIVE_PASS` | `1` | second prompt for nDSG Art. 5 data; `0` turns it off |
+| `UPSTREAM_BASE_URL`, `UPSTREAM_API_KEY`, `UPSTREAM_MODEL` | none | external model the chat proxy forwards redacted text to |
+| `LLM_TIMEOUT` | `120` | seconds per model call |
+
 Results: [docs/results.md](docs/results.md). Report: [technical_report.md](technical_report.md).
 
 ---

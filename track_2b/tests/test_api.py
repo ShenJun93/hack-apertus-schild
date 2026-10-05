@@ -101,3 +101,10 @@ def test_chat_refuses_non_string_content():
 
 def test_chat_requires_messages():
     assert client().post("/v1/chat/completions", json={}).status_code == 400
+
+
+def test_chat_avoids_literal_placeholders_across_messages():
+    up = EchoUpstream()
+    msgs = [{"role": "user", "content": "Template [PERSON_1]"}, {"role": "user", "content": "Anna Keller"}]
+    client(upstream=up).post("/v1/chat/completions", json={"messages": msgs})
+    assert up.sent[1]["content"] == "[PERSON_2]"

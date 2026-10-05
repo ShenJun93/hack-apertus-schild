@@ -23,7 +23,7 @@ def iban_valid(iban: str) -> bool:
 
 _AHV = re.compile(r"(?<!\d)756[.\s]?\d{4}[.\s]?\d{4}[.\s]?\d{2}(?!\d)")
 _IBAN = re.compile(r"(?<![0-9A-Za-z])CH\d{2}(?:\s?[0-9A-Za-z]){17}(?![0-9A-Za-z])", re.IGNORECASE)
-_PHONE = re.compile(r"(?<![\d+])(?:(?:\+|00)41[\s.-]?(?:\(0\)[\s.-]?)?|0)[1-9]\d(?:[\s.-]?\d){7}(?!\d)")
+_PHONE = re.compile(r"(?<![\d+])(?:(?:\+|00)41[\s.-]?(?:\(0\)[\s.-]?)?|0)[1-9]\d(?:[\s./-]?\d){7}(?!\d)")
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
 _MONTHS = (

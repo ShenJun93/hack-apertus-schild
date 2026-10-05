@@ -75,3 +75,8 @@ def test_offsets_point_at_the_text():
     span = detect_rules(text)[0]
     assert text[span.start:span.end] == span.text == "044 123 45 67"
     assert span.source == "rules"
+
+
+@pytest.mark.parametrize("phone", ["079/123 45 67", "044/123 45 67"])
+def test_detects_phone_with_slash(phone):
+    assert ("PHONE", phone) in kinds(f"Tel. {phone}.")
