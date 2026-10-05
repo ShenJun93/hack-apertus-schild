@@ -1,0 +1,198 @@
+{
+  "synthetic": {
+    "rules": {
+      "n_docs": 300,
+      "n_gold": 1860,
+      "n_pred": 727,
+      "recall": 0.3870967741935484,
+      "precision": 1.0,
+      "f1": 0.5581395348837209,
+      "leak_rate": 1.0,
+      "per_type": {
+        "ADDRESS": 0.0,
+        "AHV": 1.0,
+        "CRIMINAL": 0.0,
+        "DOB": 1.0,
+        "EMAIL": 1.0,
+        "ETHNICITY": 0.0,
+        "HEALTH": 0.0,
+        "IBAN": 1.0,
+        "PERSON": 0.0,
+        "PHONE": 1.0,
+        "RELIGION": 0.0,
+        "SOCIAL": 0.0
+      },
+      "per_lang": {
+        "de": 0.3870967741935484,
+        "en": 0.3870967741935484,
+        "fr": 0.3870967741935484,
+        "it": 0.3870967741935484
+      }
+    },
+    "apertus": {
+      "n_docs": 300,
+      "n_gold": 1860,
+      "n_pred": 1004,
+      "recall": 0.5129032258064516,
+      "precision": 1.0,
+      "f1": 0.6780383795309168,
+      "leak_rate": 0.9866666666666667,
+      "per_type": {
+        "ADDRESS": 0.8875,
+        "AHV": 0.9916666666666667,
+        "CRIMINAL": 0.016666666666666666,
+        "DOB": 0.36666666666666664,
+        "EMAIL": 0.075,
+        "ETHNICITY": 0.2833333333333333,
+        "HEALTH": 0.9083333333333333,
+        "IBAN": 0.5083333333333333,
+        "PERSON": 0.524074074074074,
+        "PHONE": 0.08333333333333333,
+        "RELIGION": 1.0,
+        "SOCIAL": 0.016666666666666666
+      },
+      "per_lang": {
+        "de": 0.5419354838709678,
+        "en": 0.41935483870967744,
+        "fr": 0.5483870967741935,
+        "it": 0.5419354838709678
+      }
+    },
+    "schild": {
+      "n_docs": 300,
+      "n_gold": 1860,
+      "n_pred": 1454,
+      "recall": 0.7548387096774194,
+      "precision": 1.0,
+      "f1": 0.8602941176470589,
+      "leak_rate": 0.82,
+      "per_type": {
+        "ADDRESS": 0.8875,
+        "AHV": 1.0,
+        "CRIMINAL": 0.016666666666666666,
+        "DOB": 1.0,
+        "EMAIL": 1.0,
+        "ETHNICITY": 0.2833333333333333,
+        "HEALTH": 0.9083333333333333,
+        "IBAN": 1.0,
+        "PERSON": 0.524074074074074,
+        "PHONE": 1.0,
+        "RELIGION": 1.0,
+        "SOCIAL": 0.016666666666666666
+      },
+      "per_lang": {
+        "de": 0.7956989247311828,
+        "en": 0.6989247311827957,
+        "fr": 0.7526881720430108,
+        "it": 0.7720430107526882
+      }
+    },
+    "_llm": {
+      "documents": 300,
+      "failures": 0,
+      "hallucinated": 10,
+      "latency_median_s": 0.7995000000000001,
+      "latency_p90_s": 1.076
+    }
+  },
+  "hard": {
+    "rules": {
+      "n_docs": 20,
+      "n_gold": 66,
+      "n_pred": 18,
+      "recall": 0.2727272727272727,
+      "precision": 1.0,
+      "f1": 0.42857142857142855,
+      "leak_rate": 1.0,
+      "per_type": {
+        "ADDRESS": 0.0,
+        "AHV": 1.0,
+        "CRIMINAL": 0.0,
+        "DOB": 1.0,
+        "EMAIL": 1.0,
+        "ETHNICITY": 0.0,
+        "HEALTH": 0.0,
+        "IBAN": 1.0,
+        "PERSON": 0.0,
+        "PHONE": 1.0,
+        "RELIGION": 0.0,
+        "SOCIAL": 0.0
+      },
+      "per_lang": {
+        "de": 0.2222222222222222,
+        "en": 0.26666666666666666,
+        "fr": 0.29411764705882354,
+        "it": 0.3125
+      }
+    },
+    "apertus": {
+      "n_docs": 20,
+      "n_gold": 66,
+      "n_pred": 35,
+      "recall": 0.48484848484848486,
+      "precision": 1.0,
+      "f1": 0.653061224489796,
+      "leak_rate": 1.0,
+      "per_type": {
+        "ADDRESS": 0.75,
+        "AHV": 0.6666666666666666,
+        "CRIMINAL": 0.25,
+        "DOB": 0.0,
+        "EMAIL": 0.0,
+        "ETHNICITY": 0.0,
+        "HEALTH": 0.3333333333333333,
+        "IBAN": 0.25,
+        "PERSON": 0.875,
+        "PHONE": 0.0,
+        "RELIGION": 0.25,
+        "SOCIAL": 0.25
+      },
+      "per_lang": {
+        "de": 0.4444444444444444,
+        "en": 0.3333333333333333,
+        "fr": 0.5882352941176471,
+        "it": 0.5625
+      }
+    },
+    "schild": {
+      "n_docs": 20,
+      "n_gold": 66,
+      "n_pred": 49,
+      "recall": 0.7121212121212122,
+      "precision": 1.0,
+      "f1": 0.8318584070796461,
+      "leak_rate": 0.7,
+      "per_type": {
+        "ADDRESS": 0.75,
+        "AHV": 1.0,
+        "CRIMINAL": 0.25,
+        "DOB": 1.0,
+        "EMAIL": 1.0,
+        "ETHNICITY": 0.0,
+        "HEALTH": 0.3333333333333333,
+        "IBAN": 1.0,
+        "PERSON": 0.875,
+        "PHONE": 1.0,
+        "RELIGION": 0.25,
+        "SOCIAL": 0.25
+      },
+      "per_lang": {
+        "de": 0.6666666666666666,
+        "en": 0.6,
+        "fr": 0.7647058823529411,
+        "it": 0.8125
+      }
+    },
+    "_llm": {
+      "documents": 20,
+      "failures": 0,
+      "hallucinated": 0,
+      "latency_median_s": 0.518,
+      "latency_p90_s": 0.616
+    }
+  },
+  "_meta": {
+    "model": "swiss-ai/Apertus-v1.5-8B",
+    "llm": true
+  }
+}

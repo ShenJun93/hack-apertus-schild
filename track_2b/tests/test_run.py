@@ -35,3 +35,11 @@ def test_markdown_has_all_systems(tmp_path):
     outputs = collect_llm(DOCS, FakeLlm(), "m", tmp_path / "c.jsonl")
     md = render_markdown({"synthetic": run_benchmark(DOCS, outputs)})
     assert "| rules |" in md and "| apertus |" in md and "| schild |" in md
+
+
+def test_cache_key_changes_with_the_prompt():
+    from bench.run import cache_key
+
+    assert cache_key("m", "prompt A") != cache_key("m", "prompt B")
+    assert cache_key("m", "prompt A") == cache_key("m", "prompt A")
+    assert cache_key("m", "prompt A").startswith("m|prompt-")

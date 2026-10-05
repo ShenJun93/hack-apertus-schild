@@ -1,6 +1,7 @@
 """Run the benchmark: python -m bench.run [--limit N] [--no-llm]"""
 
 import argparse
+import hashlib
 import json
 import statistics
 import sys
@@ -10,7 +11,7 @@ from pathlib import Path
 from bench.hard_cases import load_hard_cases
 from bench.metrics import evaluate
 from schild.config import load_settings
-from schild.llm_detector import DetectorUnavailable, LlmDetector
+from schild.llm_detector import SYSTEM_PROMPT, DetectorUnavailable, LlmDetector
 from schild.merge import merge_spans
 from schild.rules import detect_rules
 from schild.spans import Span
@@ -21,6 +22,11 @@ CACHE = ROOT / "data" / "llm_outputs.jsonl"
 RESULTS_JSON = ROOT / "docs" / "results.json"
 RESULTS_MD = ROOT / "docs" / "results.md"
 SYSTEMS = ("rules", "apertus", "schild")
+
+
+def cache_key(model: str, prompt: str) -> str:
+    """Model outputs are cached per model and per prompt version."""
+    return f"{model}|prompt-{hashlib.sha256(prompt.encode()).hexdigest()[:8]}"
 
 
 def load_jsonl(path: Path) -> list[dict]:
@@ -120,9 +126,9 @@ def main() -> None:
     )
     results = {}
     for name, docs in sets.items():
-        outputs = {} if llm is None else collect_llm(docs, llm, settings.llm_name, CACHE)
+        outputs = {} if llm is None else collect_llm(docs, llm, cache_key(settings.llm_name, SYSTEM_PROMPT), CACHE)
         results[name] = run_benchmark(docs, outputs)
-    results["_meta"] = {"model": settings.llm_name, "llm": not args.no_llm}
+    results["_meta"] = {"model": settings.llm_name, "prompt": cache_key(settings.llm_name, SYSTEM_PROMPT), "llm": not args.no_llm}
     RESULTS_JSON.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_JSON.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     RESULTS_MD.write_text(render_markdown({k: v for k, v in results.items() if not k.startswith("_")}), encoding="utf-8")
