@@ -25,3 +25,10 @@ build/
 .DS_Store
 .idea/
 .vscode/
+.venv/
+models/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.env
+demo/

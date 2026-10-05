@@ -58,3 +58,8 @@ LLM_API_KEY — your API key
 ## License
 
 All Hack Apertus projects are open-sourced. Please check our Terms & Conditions for specific licensing details (6. What you build is open source): https://hackapertus.ch/terms-and-conditions
+
+## This submission
+
+Track 2B — **Schild**, an on-premise redaction gateway for Swiss personal data built on Apertus.
+Everything lives in [`track_2b/`](track_2b/). Start with [`track_2b/README.md`](track_2b/README.md).
