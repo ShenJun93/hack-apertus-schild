@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from bench.hard_cases import load_hard_cases, parse_marked
 from bench.metrics import evaluate
 from schild.rules import ahv_valid, iban_valid
@@ -12,7 +10,7 @@ def test_parse_marked():
 
 
 def test_hard_cases_file_is_valid():
-    docs = load_hard_cases(Path("bench/hard_cases.txt"))
+    docs = load_hard_cases()
     assert len(docs) == 20 and {d["lang"] for d in docs} == {"de", "fr", "it", "en"}
     for d in docs:
         assert "[[" not in d["text"] and d["entities"]

@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 
+DEFAULT_PATH = Path(__file__).with_name("hard_cases.txt")
 _MARK_RE = re.compile(r"\[\[([A-Z]+):(.+?)\]\]")
 
 
@@ -22,7 +23,7 @@ def parse_marked(marked: str) -> tuple[str, list[dict]]:
     return "".join(parts), entities
 
 
-def load_hard_cases(path: Path = Path("bench/hard_cases.txt")) -> list[dict]:
+def load_hard_cases(path: Path = DEFAULT_PATH) -> list[dict]:
     docs = []
     for block in path.read_text(encoding="utf-8").split("=== ")[1:]:
         header, _, body = block.partition("\n")
