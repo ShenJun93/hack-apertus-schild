@@ -30,8 +30,9 @@ document.
 ## Does Schild beat both single systems?
 
 Yes, in every run and on both sets: rules and Apertus fail on different entity types, so their
-union is much stronger than either (run D, synthetic: 38.7% and 57.7% → 78.5%). Precision stays at
-99.9–100%: the model almost never marks text that is not personal data.
+union is much stronger than either (run D, synthetic: 38.7% and 57.7% → 78.5%). Precision is
+99.8–100% in every run except E on the hard set (95.5%, one span outside the labels): the model
+almost never marks text that is not personal data.
 
 ## Where it leaked before the second pass (run A, synthetic set)
 
