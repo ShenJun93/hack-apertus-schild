@@ -193,6 +193,8 @@
   },
   "_meta": {
     "model": "swiss-ai/Apertus-v1.5-8B",
+    "prompt": "swiss-ai/Apertus-v1.5-8B|prompt-103d8bda",
+    "passes": 2,
     "llm": true
   }
 }

@@ -18,11 +18,12 @@ Median latency per document on CSCS: A 0.8 s, D 1.3 s, C 1.7 s, E 2.4 s.
 
 After prompt v2 failed (below), a second, narrow prompt that asks only for the nDSG Art. 5 lit. c
 categories was added as a separate call. The rule decided in advance: keep it only if the hard
-set, never used for tuning, improves. It did, by 10.6 points (71.2% → 81.8%), with documents still
+set (no prompt was written against it) improves. It did, by 10.6 points (71.2% → 81.8%; 7 of 66 entities, intervals overlap), with documents still
 leaking falling from 70% to 50%. On the synthetic set CRIMINAL rose from 1.7% to 65.0% and HEALTH
-from 90.8% to 100%. The 8B model with two passes beats the 70B model with one pass on the hard set
-(81.8% vs 75.8%) at lower latency (1.3 s vs 1.7 s). Still weak: SOCIAL (5.0% synthetic) and a
-second person in the same document (PERSON 52.2%).
+from 90.8% to 100%. Against 70B with one pass the evidence is mixed: level on the hard set (81.8% vs
+75.8%, intervals overlap) but clearly behind on the synthetic set (78.5% vs 83.2% recall, 81.3% vs
+66.0% leak rate), at about the same latency (synthetic 1.3 s vs 1.7 s, hard 1.0 s vs 0.9 s). Still
+weak: SOCIAL (5.0% synthetic) and PERSON (52.2%; see below).
 
 Rules alone protect 38.7% (synthetic) and 27.3% (hard) of entities and leave something in every
 document.
@@ -49,7 +50,7 @@ almost never marks text that is not personal data.
 
 Prompt v2 added explicit guidance for exactly those failures, with examples deliberately different
 from the benchmark's word lists. It gained 1.3 points on the synthetic set it was written against
-and **lost 6 points on the hard set**, which was never used for tuning: HEALTH fell from 90.8% to
+and **lost 6 points on the hard set**, against which no prompt was written: HEALTH fell from 90.8% to
 76.7% and ADDRESS from 88.8% to 78.3% on the synthetic set, and CRIMINAL stayed at 1.7%. The longer
 prompt seems to dilute an 8B model's attention. Prompt v1 is kept.
 
@@ -61,9 +62,30 @@ misses social benefits (0%) and ethnic origin (3.3%).
 
 ## Hallucinations
 
-8–10 entities per 300 documents were reported by the model but not found in the text; they are
-dropped and do not affect redaction. None on the hard set.
+Per run, 8–22 strings on the synthetic set (A 10, B 9, C 8, D 15, E 22) and 0–1 on the hard set
+were returned by the model but not found in the text. They are dropped. Whether some are
+near-misses of real entities (whitespace or Unicode variants) was not checked.
+
+## Role of the hard set
+
+No prompt was written against the hard set, but it decided two choices: rejecting v2 and keeping
+the second prompt. It is a validation set, not an untouched test set, and the default's score on
+it is the best of three 8B configurations. 95% Wilson intervals for Schild recall on it: A 59–81%,
+B 53–76%, C 64–84%, D 71–89%, E 82–96%.
+
+## Names that leak (run D, synthetic set)
+
+258 of 540 PERSON occurrences leak: 119 of 120 second persons (signing doctor, interviewer), the
+writer's own name in 86 of 120 occurrences in bank emails (43 of 60 documents) and 46 of 120 in
+insurance emails (23 of 60), and 7 elsewhere.
+
+## Propagation
+
+Since commit "Redact every occurrence of a value once it is known", Schild also redacts every
+other occurrence of a found value, ignoring case and spacing. All tables were recomputed with it;
+no number changed, because the templates repeat values in exactly the same spelling.
 
 ## Local CPU latency (air-gapped setup)
 
-See `local-model.md`: about 60 s for one sentence on 12 CPU threads, CPU only.
+See `local-model.md`: 60 s for one sentence with one prompt on 12 CPU threads, CPU only. The
+default sends two prompts. The local quantised model was not benchmarked.

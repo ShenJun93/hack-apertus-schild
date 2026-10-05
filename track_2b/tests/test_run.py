@@ -50,3 +50,13 @@ def test_without_a_model_only_cached_outputs_are_used(tmp_path):
     collect_llm(DOCS[:1], FakeLlm([("Anna Keller", "PERSON")]), "m", cache)
     outputs = collect_llm(DOCS, None, "m", cache)
     assert list(outputs) == ["a"]
+
+
+def test_schild_system_includes_propagation():
+    docs = [{"id": "p", "lang": "de", "doc_type": "x", "text": "Anna Keller. ANNA KELLER.",
+             "entities": [{"start": 0, "end": 11, "type": "PERSON"}, {"start": 13, "end": 24, "type": "PERSON"}]}]
+    outputs = {"p": {"spans": [{"start": 0, "end": 11, "type": "PERSON", "text": "Anna Keller"}], "error": None,
+                     "hallucinated": 0, "latency_s": 0.1}}
+    results = run_benchmark(docs, outputs)
+    assert results["apertus"]["recall"] == 0.5
+    assert results["schild"]["recall"] == 1.0

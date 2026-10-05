@@ -1,4 +1,4 @@
-"""Run the benchmark: python -m bench.run [--limit N] [--no-llm] [--one-pass]"""
+"""Run the benchmark: python -m bench.run [--limit N] [--no-llm] [--one-pass] [--cache-key KEY] [--out NAME]"""
 
 import argparse
 import hashlib
@@ -13,6 +13,7 @@ from bench.metrics import evaluate
 from schild.config import load_settings
 from schild.llm_detector import DetectorUnavailable, LlmDetector, prompts_for
 from schild.merge import merge_spans
+from schild.propagate import propagate
 from schild.rules import detect_rules
 from schild.spans import Span
 
@@ -75,7 +76,8 @@ def run_benchmark(docs: list[dict], llm_outputs: dict[str, dict]) -> dict[str, d
         llm_spans = [Span(s["start"], s["end"], s["type"], s["text"], "apertus") for s in output["spans"]]
         preds["rules"][doc["id"]] = [_as_dict(s) for s in rule_spans]
         preds["apertus"][doc["id"]] = [_as_dict(s) for s in llm_spans]
-        preds["schild"][doc["id"]] = [_as_dict(s) for s in merge_spans(rule_spans + llm_spans, doc["text"])]
+        joined = propagate(doc["text"], rule_spans + llm_spans, [])
+        preds["schild"][doc["id"]] = [_as_dict(s) for s in merge_spans(joined, doc["text"])]
     results = {name: evaluate(docs, preds[name]) for name in SYSTEMS}
     latencies = sorted(o["latency_s"] for o in llm_outputs.values() if "latency_s" in o)
     results["_llm"] = {
@@ -119,16 +121,18 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--no-llm", action="store_true")
     parser.add_argument("--one-pass", action="store_true", help="skip the second, sensitive-data prompt")
+    parser.add_argument("--cache-key", help="recompute a stored run from the cache (key from its results JSON)")
+    parser.add_argument("--out", default="results", help="write docs/<OUT>.md and docs/<OUT>.json")
     args = parser.parse_args()
     sets = {"synthetic": load_jsonl(BENCHMARK), "hard": load_hard_cases()}
     if args.limit:
         sets = {k: v[: args.limit] for k, v in sets.items()}
     settings = load_settings()
     prompts = prompts_for(settings.sensitive_pass and not args.one_pass)
-    key = cache_key(settings.llm_name, "\n---\n".join(prompts))
+    key = args.cache_key or cache_key(settings.llm_name, "\n---\n".join(prompts))
     if not args.no_llm and not settings.llm_base_url:
         print("LLM_BASE_URL is not set: using cached model outputs only.", file=sys.stderr)
-    llm = None if args.no_llm or not settings.llm_base_url else LlmDetector(
+    llm = None if args.no_llm or args.cache_key or not settings.llm_base_url else LlmDetector(
         settings.llm_base_url, settings.llm_api_key, settings.llm_name, timeout=settings.llm_timeout, prompts=prompts
     )
     results = {}
@@ -136,10 +140,13 @@ def main() -> None:
         outputs = {} if args.no_llm else collect_llm(docs, llm, key, CACHE)
         results[name] = run_benchmark(docs, outputs)
     results["_meta"] = {"model": settings.llm_name, "prompt": key, "passes": len(prompts), "llm": not args.no_llm}
-    RESULTS_JSON.parent.mkdir(parents=True, exist_ok=True)
-    RESULTS_JSON.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
-    RESULTS_MD.write_text(render_markdown({k: v for k, v in results.items() if not k.startswith("_")}), encoding="utf-8")
-    print(RESULTS_MD.read_text(encoding="utf-8"))
+    out_json = RESULTS_JSON.with_name(f"{args.out}.json")
+    out_md = RESULTS_MD.with_name(f"{args.out}.md")
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
+    out_md.write_text(render_markdown({k: v for k, v in results.items() if not k.startswith("_")}),
+                      encoding="utf-8", newline="\n")
+    print(out_md.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
