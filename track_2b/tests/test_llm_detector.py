@@ -147,3 +147,48 @@ def test_empty_text_makes_no_call():
         raise AssertionError("should not be called")
 
     assert detector(handler).detect("   ").spans == []
+
+
+def test_second_prompt_adds_a_call_per_chunk_and_unions_results():
+    from schild.llm_detector import SENSITIVE_PROMPT, SYSTEM_PROMPT
+
+    asked = []
+
+    def handler(request):
+        system = json.loads(request.content)["messages"][0]["content"]
+        asked.append(system)
+        if system == SENSITIVE_PROMPT:
+            return reply(entities_json(("Sozialhilfe", "SOCIAL")))
+        return reply(entities_json(("Anna Keller", "PERSON")))
+
+    d = LlmDetector("http://model/v1", None, "m", transport=httpx.MockTransport(handler),
+                    prompts=(SYSTEM_PROMPT, SENSITIVE_PROMPT))
+    result = d.detect("Anna Keller bezieht Sozialhilfe.")
+    assert asked == [SYSTEM_PROMPT, SENSITIVE_PROMPT]
+    assert sorted((s.type, s.text) for s in result.spans) == [("PERSON", "Anna Keller"), ("SOCIAL", "Sozialhilfe")]
+
+
+def test_default_is_one_prompt():
+    from schild.llm_detector import SYSTEM_PROMPT
+
+    assert LlmDetector("http://m/v1", None, "m").prompts == (SYSTEM_PROMPT,)
+
+
+def test_sensitive_pass_failure_is_unavailable():
+    from schild.llm_detector import SENSITIVE_PROMPT, SYSTEM_PROMPT
+
+    def handler(request):
+        system = json.loads(request.content)["messages"][0]["content"]
+        return httpx.Response(500) if system == SENSITIVE_PROMPT else reply(entities_json())
+
+    d = LlmDetector("http://model/v1", None, "m", transport=httpx.MockTransport(handler),
+                    prompts=(SYSTEM_PROMPT, SENSITIVE_PROMPT))
+    with pytest.raises(DetectorUnavailable):
+        d.detect("Anna")
+
+
+def test_prompts_for_setting():
+    from schild.llm_detector import SENSITIVE_PROMPT, SYSTEM_PROMPT, prompts_for
+
+    assert prompts_for(False) == (SYSTEM_PROMPT,)
+    assert prompts_for(True) == (SYSTEM_PROMPT, SENSITIVE_PROMPT)

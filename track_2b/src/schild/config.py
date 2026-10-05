@@ -14,6 +14,7 @@ class Settings:
     upstream_base_url: str | None
     upstream_api_key: str | None
     upstream_model: str | None
+    sensitive_pass: bool = False
 
 
 def load_settings(env: Mapping[str, str] | None = None) -> Settings:
@@ -31,4 +32,5 @@ def load_settings(env: Mapping[str, str] | None = None) -> Settings:
         upstream_base_url=get("UPSTREAM_BASE_URL"),
         upstream_api_key=get("UPSTREAM_API_KEY"),
         upstream_model=get("UPSTREAM_MODEL"),
+        sensitive_pass=get("SCHILD_SENSITIVE_PASS") == "1",
     )

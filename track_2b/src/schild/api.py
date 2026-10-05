@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from .config import load_settings
-from .llm_detector import LlmDetector
+from .llm_detector import LlmDetector, prompts_for
 from .pipeline import redact_text
 from .upstream import Upstream, UpstreamError
 from .vault import SessionStore, restore
@@ -106,7 +106,11 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
 
 def create_app_from_env() -> FastAPI:
     s = load_settings()
-    llm = LlmDetector(s.llm_base_url, s.llm_api_key, s.llm_name, timeout=s.llm_timeout) if s.llm_base_url else None
+    llm = (
+        LlmDetector(s.llm_base_url, s.llm_api_key, s.llm_name, timeout=s.llm_timeout, prompts=prompts_for(s.sensitive_pass))
+        if s.llm_base_url
+        else None
+    )
     upstream = (
         Upstream(s.upstream_base_url, s.upstream_api_key, s.upstream_model or s.llm_name, timeout=s.llm_timeout)
         if s.upstream_base_url

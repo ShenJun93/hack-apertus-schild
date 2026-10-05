@@ -11,7 +11,7 @@ from pathlib import Path
 from bench.hard_cases import load_hard_cases
 from bench.metrics import evaluate
 from schild.config import load_settings
-from schild.llm_detector import SYSTEM_PROMPT, DetectorUnavailable, LlmDetector
+from schild.llm_detector import DetectorUnavailable, LlmDetector, prompts_for
 from schild.merge import merge_spans
 from schild.rules import detect_rules
 from schild.spans import Span
@@ -114,21 +114,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--no-llm", action="store_true")
+    parser.add_argument("--sensitive-pass", action="store_true", help="add the second, sensitive-data prompt")
     args = parser.parse_args()
     sets = {"synthetic": load_jsonl(BENCHMARK), "hard": load_hard_cases()}
     if args.limit:
         sets = {k: v[: args.limit] for k, v in sets.items()}
     settings = load_settings()
+    prompts = prompts_for(args.sensitive_pass or settings.sensitive_pass)
+    key = cache_key(settings.llm_name, "\n---\n".join(prompts))
     if not args.no_llm and not settings.llm_base_url:
         sys.exit("LLM_BASE_URL is not set. Use --no-llm for a rules-only run.")
     llm = None if args.no_llm else LlmDetector(
-        settings.llm_base_url, settings.llm_api_key, settings.llm_name, timeout=settings.llm_timeout
+        settings.llm_base_url, settings.llm_api_key, settings.llm_name, timeout=settings.llm_timeout, prompts=prompts
     )
     results = {}
     for name, docs in sets.items():
-        outputs = {} if llm is None else collect_llm(docs, llm, cache_key(settings.llm_name, SYSTEM_PROMPT), CACHE)
+        outputs = {} if llm is None else collect_llm(docs, llm, key, CACHE)
         results[name] = run_benchmark(docs, outputs)
-    results["_meta"] = {"model": settings.llm_name, "prompt": cache_key(settings.llm_name, SYSTEM_PROMPT), "llm": not args.no_llm}
+    results["_meta"] = {"model": settings.llm_name, "prompt": key, "passes": len(prompts), "llm": not args.no_llm}
     RESULTS_JSON.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_JSON.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     RESULTS_MD.write_text(render_markdown({k: v for k, v in results.items() if not k.startswith("_")}), encoding="utf-8")
