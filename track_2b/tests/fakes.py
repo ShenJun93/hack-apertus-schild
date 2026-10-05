@@ -1,11 +1,9 @@
-import re
-
-from schild.llm_detector import DetectorUnavailable, LlmResult
+from schild.llm_detector import DetectorUnavailable, LlmResult, locate
 from schild.spans import Span
 
 
 class FakeLlm:
-    """Finds the given (value, TYPE) pairs wherever they occur."""
+    """Finds the given (value, TYPE) pairs the way the real detector locates them."""
 
     def __init__(self, entities=(), fail=False):
         self.entities = list(entities)
@@ -18,8 +16,8 @@ class FakeLlm:
             raise DetectorUnavailable("fake outage")
         spans = []
         for value, type_ in self.entities:
-            for m in re.finditer(re.escape(value), text):
-                spans.append(Span(m.start(), m.end(), type_, value, "apertus"))
+            for start, end in locate(text, value):
+                spans.append(Span(start, end, type_, text[start:end], "apertus"))
         return LlmResult(spans, 0)
 
 

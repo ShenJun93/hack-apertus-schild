@@ -36,6 +36,10 @@ class Session:
         self._reverse[candidate] = value
         return candidate
 
+    def known(self) -> list[tuple[str, str]]:
+        """(type, value) for every value this session has already replaced."""
+        return [(span_type, self._reverse[ph]) for (span_type, _), ph in self._forward.items()]
+
     def original(self, placeholder: str) -> str | None:
         return self._reverse.get(placeholder.upper())
 

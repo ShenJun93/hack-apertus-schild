@@ -107,7 +107,7 @@ def locate(chunk: str, value: str) -> list[tuple[int, int]]:
     value = value.strip()
     if len(value) < 2:
         return []
-    pattern = re.escape(value)
+    pattern = rf"(?<!\w){re.escape(value)}(?!\w)"
     found = [(m.start(), m.end()) for m in re.finditer(pattern, chunk)]
     if not found:
         found = [(m.start(), m.end()) for m in re.finditer(pattern, chunk, re.IGNORECASE)]

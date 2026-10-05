@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from .llm_detector import DetectorUnavailable
 from .merge import merge_spans
+from .propagate import propagate
 from .rules import detect_rules
 from .vault import Session, apply
 
@@ -26,5 +27,6 @@ def redact_text(text: str, session: Session, llm) -> RedactionResult:
             hallucinated = result.hallucinated
         except DetectorUnavailable:
             degraded = True
+    spans = propagate(text, spans, session.known())
     redacted, entities = apply(text, merge_spans(spans, text), session)
     return RedactionResult(session.id, redacted, entities, degraded, hallucinated)

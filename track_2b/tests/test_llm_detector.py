@@ -192,3 +192,10 @@ def test_prompts_for_setting():
 
     assert prompts_for(False) == (SYSTEM_PROMPT,)
     assert prompts_for(True) == (SYSTEM_PROMPT, SENSITIVE_PROMPT)
+
+
+def test_locate_matches_whole_words_only():
+    from schild.llm_detector import locate
+
+    assert locate("Lea kommt. Leasing ist teuer.", "Lea") == [(0, 3)]
+    assert locate("Tel. +41 (0)21 345 67 89.", "+41 (0)21 345 67 89") == [(5, 24)]
