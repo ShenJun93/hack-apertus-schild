@@ -1,0 +1,40 @@
+=== de-h01
+Hoi [[PERSON:Röbi]], chasch du am [[PERSON:Fritz Weiss]] säge, dass er sini [[HEALTH:Insulinspritze]] im Büro vergässe hät? Er wohnt jo i de [[ADDRESS:Bärenmatte 4, 3011 Bern]].
+=== de-h02
+Frau [[PERSON:Engel]] hat angerufen. Sie ist seit der Chemotherapie wegen [[HEALTH:Brustkrebs]] krankgeschrieben und möchte, dass die Taggelder ab sofort auf [[IBAN:ch24 0483 5035 2181 7200 a]] gehen.
+=== de-h03
+Gemäss Polizeirapport wurde [[PERSON:Luca Bernasconi]] am Wochenende wegen [[CRIMINAL:häuslicher Gewalt]] festgenommen. Seine AHV-Nummer lautet [[AHV:7561234567897]].
+=== de-h04
+Notiz: Klient [[PERSON:M. Hasanović]] bittet, Termine nicht während des [[RELIGION:Ramadan]] zu legen. Er lebt von der [[SOCIAL:Sozialhilfe der Stadt Zürich]]. Erreichbar unter [[PHONE:0041 79 555 12 34]].
+=== de-h05
+Lieber Herr [[PERSON:Brunner]], Ihre Tochter [[PERSON:Lea]] darf wegen ihrer [[HEALTH:Nussallergie]] nicht am Kochkurs teilnehmen. Bei Fragen schreiben Sie an [[EMAIL:l.brunner@gmx.ch]].
+=== fr-h01
+Salut [[PERSON:Jean-Daniel]], Mme [[PERSON:Rochat]] ne viendra pas : elle est hospitalisée à cause de sa [[HEALTH:sclérose en plaques]]. Son mari peut être joint au [[PHONE:+41 (0)21 345 67 89]].
+=== fr-h02
+Le dossier de [[PERSON:Kevin Moreira Da Silva]] (AVS [[AHV:756 9876 5432 17]]) mentionne une condamnation pour [[CRIMINAL:recel]] en 2019.
+=== fr-h03
+Mme [[PERSON:Ngoyi]], [[ETHNICITY:d'origine congolaise]], touche [[SOCIAL:l'aide sociale vaudoise]] depuis 2024 et habite [[ADDRESS:chemin des Lilas 12, 1004 Lausanne]].
+=== fr-h04
+Rappel : le pasteur demande que [[PERSON:Pierre-Alain Favre]], membre de l'[[RELIGION:Église évangélique libre]], soit informé du rendez-vous à l'adresse [[EMAIL:pa.favre@bluewin.ch]].
+=== fr-h05
+Paiement refusé – cliente [[PERSON:Thérèse Python]], IBAN [[IBAN:CH24 0483 5035 2181 7200 A]], née le [[DOB:3 avril 1958]].
+=== it-h01
+Ciao [[PERSON:Gianni]], la signora [[PERSON:Bianchi]] è in [[HEALTH:dialisi]] tre volte alla settimana, quindi non può lavorare il martedì.
+=== it-h02
+Il signor [[PERSON:Marco Rossi-Pedrazzini]], nato il [[DOB:14.07.1971]], riceve [[SOCIAL:una rendita AI]] e vive in [[ADDRESS:via Nassa 5, 6900 Lugano]].
+=== it-h03
+Secondo il verbale, [[PERSON:Ardit Krasniqi]] è indagato per [[CRIMINAL:spaccio di stupefacenti]]. Telefono: [[PHONE:091 234 56 78]].
+=== it-h04
+La paziente, [[RELIGION:testimone di Geova]], rifiuta le trasfusioni. Riferimento: dott.ssa [[PERSON:Elena Galli]], [[EMAIL:e.galli@ospedale-esempio.ch]].
+=== it-h05
+Pagamento da [[IBAN:CH93 0076 2011 6238 5295 7]] a favore di [[PERSON:Rosa Bernasconi]], AVS [[AHV:756.0000.1111.28]].
+=== en-h01
+Quick note: [[PERSON:Sam]] from accounting is off until Monday because of [[HEALTH:burnout]], doctor's orders. Please keep it to yourself.
+=== en-h02
+Please update the file for Ms [[PERSON:Aylin Demir]]: she is [[ETHNICITY:of Kurdish origin]] and needs a Kurmanji interpreter. New address [[ADDRESS:Langstrasse 120, 8004 Zürich]].
+=== en-h03
+[[PERSON:Tom Baker]] (DOB [[DOB:02/11/1990]]) was convicted of [[CRIMINAL:fraud]] in 2021; HR must not mention this in references.
+=== en-h04
+Wire the refund to [[IBAN:ch93 0076 2011 6238 5295 7]] and send the receipt to [[EMAIL:j.meier@proton.me]]. Thanks, [[PERSON:Jonas Meier]].
+=== en-h05
+Reminder: [[PERSON:David Levy]] observes [[RELIGION:Shabbat]], so no Saturday shifts. He receives [[SOCIAL:supplementary benefits]] and his number is [[PHONE:+41 78 912 34 56]].
