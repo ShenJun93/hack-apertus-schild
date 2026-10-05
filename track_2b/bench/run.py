@@ -38,6 +38,10 @@ def _as_dict(span: Span) -> dict:
 
 
 def collect_llm(docs: list[dict], llm, model: str, cache_path: Path) -> dict[str, dict]:
+    """Return model outputs per document, calling the model only for documents not cached yet.
+
+    With llm=None nothing is called and only cached outputs are returned.
+    """
     cached = {}
     if cache_path.exists():
         for row in load_jsonl(cache_path):
@@ -46,7 +50,7 @@ def collect_llm(docs: list[dict], llm, model: str, cache_path: Path) -> dict[str
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     with cache_path.open("a", encoding="utf-8", newline="\n") as f:
         for n, doc in enumerate(docs, 1):
-            if doc["id"] in cached:
+            if doc["id"] in cached or llm is None:
                 continue
             started = time.perf_counter()
             try:
@@ -123,13 +127,13 @@ def main() -> None:
     prompts = prompts_for(settings.sensitive_pass and not args.one_pass)
     key = cache_key(settings.llm_name, "\n---\n".join(prompts))
     if not args.no_llm and not settings.llm_base_url:
-        sys.exit("LLM_BASE_URL is not set. Use --no-llm for a rules-only run.")
-    llm = None if args.no_llm else LlmDetector(
+        print("LLM_BASE_URL is not set: using cached model outputs only.", file=sys.stderr)
+    llm = None if args.no_llm or not settings.llm_base_url else LlmDetector(
         settings.llm_base_url, settings.llm_api_key, settings.llm_name, timeout=settings.llm_timeout, prompts=prompts
     )
     results = {}
     for name, docs in sets.items():
-        outputs = {} if llm is None else collect_llm(docs, llm, key, CACHE)
+        outputs = {} if args.no_llm else collect_llm(docs, llm, key, CACHE)
         results[name] = run_benchmark(docs, outputs)
     results["_meta"] = {"model": settings.llm_name, "prompt": key, "passes": len(prompts), "llm": not args.no_llm}
     RESULTS_JSON.parent.mkdir(parents=True, exist_ok=True)

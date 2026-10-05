@@ -43,3 +43,10 @@ def test_cache_key_changes_with_the_prompt():
     assert cache_key("m", "prompt A") != cache_key("m", "prompt B")
     assert cache_key("m", "prompt A") == cache_key("m", "prompt A")
     assert cache_key("m", "prompt A").startswith("m|prompt-")
+
+
+def test_without_a_model_only_cached_outputs_are_used(tmp_path):
+    cache = tmp_path / "c.jsonl"
+    collect_llm(DOCS[:1], FakeLlm([("Anna Keller", "PERSON")]), "m", cache)
+    outputs = collect_llm(DOCS, None, "m", cache)
+    assert list(outputs) == ["a"]
