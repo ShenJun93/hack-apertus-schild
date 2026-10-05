@@ -36,6 +36,6 @@ def test_upstream_errors():
 
 
 def test_sensitive_pass_setting():
-    assert load_settings({}).sensitive_pass is False
+    assert load_settings({}).sensitive_pass is True
     assert load_settings({"SCHILD_SENSITIVE_PASS": "1"}).sensitive_pass is True
     assert load_settings({"SCHILD_SENSITIVE_PASS": "0"}).sensitive_pass is False

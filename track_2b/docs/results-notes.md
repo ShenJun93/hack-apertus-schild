@@ -6,9 +6,23 @@ model and prompt hash, so every table can be recomputed without calling the mode
 
 | Run | Prompt | Model | Synthetic: Schild recall / leak rate | Hard set: Schild recall / leak rate | Tables |
 |---|---|---|---|---|---|
-| A (main) | v1 `103d8bda` | Apertus-v1.5-8B | 75.5% / 82.0% | 71.2% / 70.0% | `results.md` (= `results-prompt-v1.md`) |
-| B | v2 (`prompt-v2.diff`) | Apertus-v1.5-8B | 76.8% / 79.0% | 65.2% / 80.0% | `results-prompt-v2.md` |
-| C | v1 `103d8bda` | Apertus-v1.5-70B | 83.2% / 66.0% | 75.8% / 70.0% | `results-70b.md` |
+| A | v1 `103d8bda`, one pass | Apertus-v1.5-8B | 75.5% / 82.0% | 71.2% / 70.0% | `results-prompt-v1.md` |
+| B | v2 (`prompt-v2.diff`), one pass | Apertus-v1.5-8B | 76.8% / 79.0% | 65.2% / 80.0% | `results-prompt-v2.md` |
+| C | v1, one pass | Apertus-v1.5-70B | 83.2% / 66.0% | 75.8% / 70.0% | `results-70b.md` |
+| **D (default)** | v1 + sensitive pass | Apertus-v1.5-8B | **78.5% / 81.3%** | **81.8% / 50.0%** | `results.md` (= `results-two-pass.md`) |
+| E | v1 + sensitive pass | Apertus-v1.5-70B | 88.1% / 58.7% | 90.9% / 30.0% | `results-70b-two-pass.md` |
+
+Median latency per document on CSCS: A 0.8 s, D 1.3 s, C 1.7 s, E 2.4 s.
+
+## The second pass (runs D and E) is the default
+
+After prompt v2 failed (below), a second, narrow prompt that asks only for the nDSG Art. 5 lit. c
+categories was added as a separate call. The rule decided in advance: keep it only if the hard
+set, never used for tuning, improves. It did, by 10.6 points (71.2% → 81.8%), with documents still
+leaking falling from 70% to 50%. On the synthetic set CRIMINAL rose from 1.7% to 65.0% and HEALTH
+from 90.8% to 100%. The 8B model with two passes beats the 70B model with one pass on the hard set
+(81.8% vs 75.8%) at lower latency (1.3 s vs 1.7 s). Still weak: SOCIAL (5.0% synthetic) and a
+second person in the same document (PERSON 52.2%).
 
 Rules alone protect 38.7% (synthetic) and 27.3% (hard) of entities and leave something in every
 document.
@@ -16,10 +30,10 @@ document.
 ## Does Schild beat both single systems?
 
 Yes, in every run and on both sets: rules and Apertus fail on different entity types, so their
-union is much stronger than either (run A, synthetic: 38.7% and 51.3% → 75.5%). Precision stays at
+union is much stronger than either (run D, synthetic: 38.7% and 57.7% → 78.5%). Precision stays at
 99.9–100%: the model almost never marks text that is not personal data.
 
-## Where it leaks (run A, synthetic set)
+## Where it leaked before the second pass (run A, synthetic set)
 
 - **Second person in a document** (author, doctor, interviewer): PERSON recall is 52.4%. In
   `de-hr-000` Apertus returned the employee and the address but not the interviewer

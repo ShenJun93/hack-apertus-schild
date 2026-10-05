@@ -1,4 +1,4 @@
-"""Run the benchmark: python -m bench.run [--limit N] [--no-llm]"""
+"""Run the benchmark: python -m bench.run [--limit N] [--no-llm] [--one-pass]"""
 
 import argparse
 import hashlib
@@ -114,13 +114,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--no-llm", action="store_true")
-    parser.add_argument("--sensitive-pass", action="store_true", help="add the second, sensitive-data prompt")
+    parser.add_argument("--one-pass", action="store_true", help="skip the second, sensitive-data prompt")
     args = parser.parse_args()
     sets = {"synthetic": load_jsonl(BENCHMARK), "hard": load_hard_cases()}
     if args.limit:
         sets = {k: v[: args.limit] for k, v in sets.items()}
     settings = load_settings()
-    prompts = prompts_for(args.sensitive_pass or settings.sensitive_pass)
+    prompts = prompts_for(settings.sensitive_pass and not args.one_pass)
     key = cache_key(settings.llm_name, "\n---\n".join(prompts))
     if not args.no_llm and not settings.llm_base_url:
         sys.exit("LLM_BASE_URL is not set. Use --no-llm for a rules-only run.")

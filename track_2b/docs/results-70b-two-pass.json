@@ -32,67 +32,67 @@
     "apertus": {
       "n_docs": 300,
       "n_gold": 1860,
-      "n_pred": 1526,
-      "recall": 0.5774193548387097,
-      "precision": 0.9993446920052425,
-      "f1": 0.7319306505931058,
-      "leak_rate": 0.9633333333333334,
+      "n_pred": 1469,
+      "recall": 0.6521505376344086,
+      "precision": 0.9979577944179714,
+      "f1": 0.7888193757032305,
+      "leak_rate": 0.93,
       "per_type": {
-        "ADDRESS": 0.9,
-        "AHV": 0.9916666666666667,
-        "CRIMINAL": 0.65,
-        "DOB": 0.5833333333333334,
-        "EMAIL": 0.15833333333333333,
-        "ETHNICITY": 0.35,
+        "ADDRESS": 0.9625,
+        "AHV": 0.9333333333333333,
+        "CRIMINAL": 0.85,
+        "DOB": 0.5222222222222223,
+        "EMAIL": 0.14166666666666666,
+        "ETHNICITY": 0.5,
         "HEALTH": 1.0,
-        "IBAN": 0.55,
-        "PERSON": 0.5222222222222223,
-        "PHONE": 0.13333333333333333,
+        "IBAN": 0.43333333333333335,
+        "PERSON": 0.762962962962963,
+        "PHONE": 0.10555555555555556,
         "RELIGION": 1.0,
-        "SOCIAL": 0.05
+        "SOCIAL": 0.25
       },
       "per_lang": {
-        "de": 0.5913978494623656,
-        "en": 0.5053763440860215,
-        "fr": 0.5978494623655914,
-        "it": 0.6150537634408603
+        "de": 0.6731182795698925,
+        "en": 0.7010752688172043,
+        "fr": 0.6301075268817204,
+        "it": 0.6043010752688172
       }
     },
     "schild": {
       "n_docs": 300,
       "n_gold": 1860,
-      "n_pred": 1497,
-      "recall": 0.785483870967742,
-      "precision": 0.9993319973279893,
-      "f1": 0.8795968027700793,
-      "leak_rate": 0.8133333333333334,
+      "n_pred": 1703,
+      "recall": 0.8811827956989248,
+      "precision": 0.9982384028185555,
+      "f1": 0.936065324008851,
+      "leak_rate": 0.5866666666666667,
       "per_type": {
-        "ADDRESS": 0.9,
+        "ADDRESS": 0.9625,
         "AHV": 1.0,
-        "CRIMINAL": 0.65,
+        "CRIMINAL": 0.85,
         "DOB": 1.0,
         "EMAIL": 1.0,
-        "ETHNICITY": 0.35,
+        "ETHNICITY": 0.5,
         "HEALTH": 1.0,
         "IBAN": 1.0,
-        "PERSON": 0.5222222222222223,
+        "PERSON": 0.762962962962963,
         "PHONE": 1.0,
         "RELIGION": 1.0,
-        "SOCIAL": 0.05
+        "SOCIAL": 0.25
       },
       "per_lang": {
-        "de": 0.8086021505376344,
-        "en": 0.7505376344086021,
-        "fr": 0.7784946236559139,
-        "it": 0.8043010752688172
+        "de": 0.9010752688172043,
+        "en": 0.9010752688172043,
+        "fr": 0.896774193548387,
+        "it": 0.8258064516129032
       }
     },
     "_llm": {
       "documents": 300,
       "failures": 0,
-      "hallucinated": 15,
-      "latency_median_s": 1.339,
-      "latency_p90_s": 1.767
+      "hallucinated": 22,
+      "latency_median_s": 2.4459999999999997,
+      "latency_p90_s": 3.084
     }
   },
   "hard": {
@@ -128,72 +128,72 @@
     "apertus": {
       "n_docs": 20,
       "n_gold": 66,
-      "n_pred": 59,
-      "recall": 0.6363636363636364,
-      "precision": 1.0,
-      "f1": 0.7777777777777778,
-      "leak_rate": 0.8,
+      "n_pred": 60,
+      "recall": 0.7121212121212122,
+      "precision": 0.95,
+      "f1": 0.8140382862351869,
+      "leak_rate": 0.75,
       "per_type": {
-        "ADDRESS": 0.5,
-        "AHV": 0.6666666666666666,
-        "CRIMINAL": 0.75,
+        "ADDRESS": 1.0,
+        "AHV": 1.0,
+        "CRIMINAL": 1.0,
         "DOB": 0.6666666666666666,
         "EMAIL": 0.0,
         "ETHNICITY": 0.5,
         "HEALTH": 0.8333333333333334,
-        "IBAN": 0.25,
-        "PERSON": 0.875,
-        "PHONE": 0.25,
-        "RELIGION": 0.5,
-        "SOCIAL": 0.5
-      },
-      "per_lang": {
-        "de": 0.5,
-        "en": 0.5333333333333333,
-        "fr": 0.7647058823529411,
-        "it": 0.75
-      }
-    },
-    "schild": {
-      "n_docs": 20,
-      "n_gold": 66,
-      "n_pred": 56,
-      "recall": 0.8181818181818182,
-      "precision": 1.0,
-      "f1": 0.9,
-      "leak_rate": 0.5,
-      "per_type": {
-        "ADDRESS": 0.5,
-        "AHV": 1.0,
-        "CRIMINAL": 0.75,
-        "DOB": 1.0,
-        "EMAIL": 1.0,
-        "ETHNICITY": 0.5,
-        "HEALTH": 0.8333333333333334,
-        "IBAN": 1.0,
-        "PERSON": 0.875,
-        "PHONE": 1.0,
+        "IBAN": 0.0,
+        "PERSON": 1.0,
+        "PHONE": 0.0,
         "RELIGION": 0.5,
         "SOCIAL": 0.5
       },
       "per_lang": {
         "de": 0.7222222222222222,
-        "en": 0.7333333333333333,
-        "fr": 0.8823529411764706,
+        "en": 0.6666666666666666,
+        "fr": 0.7647058823529411,
+        "it": 0.6875
+      }
+    },
+    "schild": {
+      "n_docs": 20,
+      "n_gold": 66,
+      "n_pred": 66,
+      "recall": 0.9090909090909091,
+      "precision": 0.9545454545454546,
+      "f1": 0.9312638580931263,
+      "leak_rate": 0.3,
+      "per_type": {
+        "ADDRESS": 1.0,
+        "AHV": 1.0,
+        "CRIMINAL": 1.0,
+        "DOB": 1.0,
+        "EMAIL": 1.0,
+        "ETHNICITY": 0.5,
+        "HEALTH": 0.8333333333333334,
+        "IBAN": 1.0,
+        "PERSON": 1.0,
+        "PHONE": 1.0,
+        "RELIGION": 0.5,
+        "SOCIAL": 0.5
+      },
+      "per_lang": {
+        "de": 0.8888888888888888,
+        "en": 0.8666666666666667,
+        "fr": 0.9411764705882353,
         "it": 0.9375
       }
     },
     "_llm": {
       "documents": 20,
       "failures": 0,
-      "hallucinated": 1,
-      "latency_median_s": 0.976,
-      "latency_p90_s": 1.048
+      "hallucinated": 0,
+      "latency_median_s": 1.7825,
+      "latency_p90_s": 2.36
     }
   },
   "_meta": {
-    "model": "swiss-ai/Apertus-v1.5-8B",
-    "prompt": "swiss-ai/Apertus-v1.5-8B|prompt-b85291a6",
+    "model": "swiss-ai/Apertus-v1.5-70B",
+    "prompt": "swiss-ai/Apertus-v1.5-70B|prompt-b85291a6",
     "passes": 2,
     "llm": true
   }
