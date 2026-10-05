@@ -1,4 +1,35 @@
-# Track 2 B: Own Project
+# Schild — personal data stays inside
+
+Schild redacts Swiss personal data before text reaches any external AI. Checksum rules catch AHV
+numbers, IBANs, phone numbers, emails and birth dates; Apertus 1.5 8B, running on your own
+hardware, catches what rules cannot: names, addresses, and the "particularly sensitive" data of
+nDSG Art. 5 (health, religion, ethnic origin, criminal and social-assistance matters), in German,
+French, Italian and English. Placeholders are stable per conversation and swapped back on return.
+If the Apertus pass fails, Schild refuses to forward anything.
+
+![Architecture](docs/architecture.svg)
+
+## Run
+
+    export LLM_BASE_URL=... LLM_API_KEY=... LLM_NAME=...
+    make run            # http://localhost:8080
+    make local          # air-gapped: Apertus in a local llama.cpp container (docs/local-model.md)
+    make test           # unit tests in Docker
+    make bench          # benchmark → docs/results.md
+
+## API
+
+    POST /v1/redact              {"text": "...", "session_id": optional}
+    POST /v1/restore             {"session_id": "...", "text": "..."}
+    POST /v1/chat/completions    OpenAI-compatible; forwards only redacted text to UPSTREAM_BASE_URL
+
+Results: [docs/results.md](docs/results.md). Report: [technical_report.md](technical_report.md).
+
+---
+
+## Challenge
+
+### Track 2 B: Own Project
 
 Bring your own idea and build a working Apertus prototype that tackles a problem you care about — any domain, any use case. The project must be new, started within the hackathon period.
 
