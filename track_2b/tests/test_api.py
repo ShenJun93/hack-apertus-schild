@@ -37,8 +37,25 @@ def test_restore_unknown_session_404():
     assert client().post("/v1/restore", json={"session_id": "nope", "text": "x"}).status_code == 404
 
 
-def test_redact_bad_session_id_422():
-    assert client().post("/v1/redact", json={"text": "x", "session_id": "a/b"}).status_code == 422
+def test_redact_unknown_session_id_404():
+    c = client()
+    assert c.post("/v1/redact", json={"text": "x", "session_id": "demo"}).status_code == 404
+    assert c.post("/v1/redact", json={"text": "x", "session_id": "a/b"}).status_code == 404
+    assert c.post("/v1/restore", json={"session_id": "demo", "text": "[PERSON_1]"}).status_code == 404
+
+
+def test_chat_refuses_unknown_roles():
+    up = EchoUpstream()
+    for role in ("Anna Keller AHV 756.1234.5678.97", {"x": "Anna Keller"}):
+        r = client(upstream=up).post("/v1/chat/completions", json={"messages": [{"role": role, "content": "hi"}]})
+        assert r.status_code == 400
+    assert up.sent is None
+
+
+def test_chat_accepts_standard_roles():
+    up = EchoUpstream()
+    msgs = [{"role": "system", "content": "s"}, {"role": "user", "content": "u"}, {"role": "assistant", "content": "a"}]
+    assert client(upstream=up).post("/v1/chat/completions", json={"messages": msgs}).status_code == 200
 
 
 def test_chat_forwards_redacted_and_restores_answer():

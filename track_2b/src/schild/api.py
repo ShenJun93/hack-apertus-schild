@@ -13,6 +13,7 @@ from .upstream import Upstream, UpstreamError
 from .vault import SessionStore, restore
 
 MAX_CHARS = 200_000
+ROLES = {"system", "user", "assistant", "developer", "tool"}
 
 
 class RedactIn(BaseModel):
@@ -30,10 +31,14 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
     store = store or SessionStore()
 
     def session_for(session_id):
-        try:
-            return store.get_or_create(session_id)
-        except ValueError:
-            raise HTTPException(422, "invalid session_id")
+        # Only the server creates sessions: a client-chosen id could share placeholders with, or
+        # restore the values of, another client.
+        if session_id is None:
+            return store.get_or_create()
+        session = store.get(session_id)
+        if session is None:
+            raise HTTPException(404, "unknown session_id")
+        return session
 
     @app.get("/", response_class=HTMLResponse)
     def index():
@@ -65,6 +70,9 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
         for message in messages:
             if not isinstance(message, dict) or not isinstance(message.get("content"), str):
                 raise HTTPException(400, "Only string message content is supported.")
+            role = message.get("role", "user")
+            if not isinstance(role, str) or role not in ROLES:
+                raise HTTPException(400, "Unknown message role.")
             if len(message["content"]) > MAX_CHARS:
                 raise HTTPException(413, "message too long")
             result = redact_text(message["content"], session, llm)
@@ -74,7 +82,7 @@ def create_app(llm=None, upstream=None, store: SessionStore | None = None) -> Fa
                     content={"error": {"type": "schild_degraded", "message": "The Apertus pass did not run, so nothing was forwarded."}},
                 )
             count += len(result.entities)
-            outgoing.append({"role": message.get("role", "user"), "content": result.redacted_text})
+            outgoing.append({"role": role, "content": result.redacted_text})
         meta = {"session_id": session.id, "entities_redacted": count}
         if upstream is None:
             preview = json.dumps(outgoing, ensure_ascii=False, indent=2)
