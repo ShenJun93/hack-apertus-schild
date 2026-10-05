@@ -3,7 +3,7 @@
 - **Track:** Track 2B — Schild: on-premise redaction of Swiss personal data with Apertus
 - **Event:** Online
 - **Team:** ShenJun93 — Hoa Nguyen
-- **Demo:** `link to video`
+- **Demo:** https://youtu.be/QQ4zQh5Uu2g
 
 ## 1. Summary
 

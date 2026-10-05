@@ -32,7 +32,7 @@ If the Apertus pass fails, Schild refuses to forward anything.
 | `UPSTREAM_BASE_URL`, `UPSTREAM_API_KEY`, `UPSTREAM_MODEL` | none | external model the chat proxy forwards redacted text to |
 | `LLM_TIMEOUT` | `120` | seconds per model call |
 
-Results: [docs/results.md](docs/results.md). Report: [technical_report.md](technical_report.md).
+Results: [docs/results.md](docs/results.md). Report: [technical_report.md](technical_report.md). Demo video: https://youtu.be/QQ4zQh5Uu2g
 
 ---
 
